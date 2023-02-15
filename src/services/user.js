@@ -11,7 +11,7 @@ export const getUser = () => {
 
 export const addNotificationToken = async ({ token, deviceId }) => {
   try {
-    const userId = getUser().email;
+    const userId = getUser().uid;
     const userRef = firestore().collection('users').doc(userId);
     const snapShot = await userRef.get();
     if (!snapShot.exists) {
@@ -40,7 +40,7 @@ export const addNotificationToken = async ({ token, deviceId }) => {
 
 export const removeNotificationToken = async ({ deviceId }) => {
   try {
-    const userId = getUser().email;
+    const userId = getUser().uid;
     const userRef = firestore().collection('users').doc(userId);
     const snapShot = await userRef.get();
     if (snapShot.exists) {
@@ -57,7 +57,38 @@ export const removeNotificationToken = async ({ deviceId }) => {
 };
 
 export const updateUserData = async data => {
-  const email = getUser().email;
-  const userRef = firestore().collection('users').doc(email);
+  const userId = getUser().uid;
+  const userRef = firestore().collection('users').doc(userId);
   return userRef.update(data);
+};
+
+export const updateNotification = async ({ id, data }) => {
+  const userId = getUser().uid;
+  try {
+    await firestore()
+      .collection('users')
+      .doc(userId)
+      .collection('notifications')
+      .doc(id)
+      .update({ ...data });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const notificationsRef = () => {
+  const userId = getUser().uid;
+  return firestore()
+    .collection('users')
+    .doc(userId)
+    .collection('notifications');
+};
+
+export const addDataToNotificationsCollection = () => {
+  const userId = getUser().uid;
+  return firestore()
+    .collection('users')
+    .doc(userId)
+    .collection('notifications')
+    .add({});
 };
